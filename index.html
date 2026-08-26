@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Geo Comments — Test Harness</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        font-family:
+          system-ui,
+          -apple-system,
+          'Segoe UI',
+          sans-serif;
+        background: #f1f3f5;
+      }
+      body {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .harness-bar {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 16px;
+        background: #212529;
+        color: #f8f9fa;
+      }
+      .harness-bar h1 {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 600;
+      }
+      .harness-bar .spacer {
+        flex: 1;
+      }
+      .harness-bar button {
+        border: 1px solid #495057;
+        border-radius: 6px;
+        background: #343a40;
+        color: #f8f9fa;
+        font:
+          500 12.5px system-ui,
+          sans-serif;
+        padding: 6px 12px;
+        cursor: pointer;
+      }
+      .harness-bar button:hover {
+        background: #495057;
+      }
+
+      #app-root {
+        flex: 1;
+        min-height: 0;
+        padding: 12px;
+        display: flex;
+      }
+
+      /*
+     * Layout contract for your component — styling is NOT part of the test.
+     * If <interact-map> and <mock-comments-panel> are direct children of
+     * <geo-comments-app>, they get the map-left / sidebar-right split
+     * automatically. If you prefer your own wrappers, put the classes
+     * .app-map / .app-sidebar on them instead.
+     */
+      geo-comments-app {
+        flex: 1;
+        display: flex;
+        gap: 12px;
+        min-height: 0;
+      }
+      geo-comments-app > interact-map,
+      geo-comments-app .app-map {
+        flex: 1;
+        min-width: 0;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+      }
+      geo-comments-app > mock-comments-panel,
+      geo-comments-app .app-sidebar {
+        width: 380px;
+        max-width: 45%;
+      }
+
+      interact-map .im-status[hidden] {
+        display: none;
+      }
+
+      .harness-placeholder {
+        margin: auto;
+        color: #868e96;
+        font-size: 14px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="harness-bar">
+      <h1>Geo Comments — Test Harness</h1>
+      <span class="spacer"></span>
+      <button id="toggle-attach" type="button">Detach component</button>
+    </div>
+
+    <main id="app-root">
+      <geo-comments-app></geo-comments-app>
+    </main>
+
+    <!-- Third-party widgets: they register their custom elements on import -->
+    <script type="module" src="./libs/interact-map/interact-map.js"></script>
+    <script
+      type="module"
+      src="./libs/comments-panel/mock-comments-panel.js"
+    ></script>
+
+    <!-- Your code -->
+    <script type="module" src="./src/main.js"></script>
+
+    <script type="module">
+      // Harness-only helper for the lifecycle stretch goal: detach the whole
+      // app component from the DOM and put it back.
+      const root = document.getElementById('app-root');
+      const button = document.getElementById('toggle-attach');
+      let detachedApp = null;
+
+      button.addEventListener('click', () => {
+        if (detachedApp) {
+          root.appendChild(detachedApp);
+          detachedApp = null;
+          button.textContent = 'Detach component';
+        } else {
+          const app = root.querySelector('geo-comments-app');
+          if (!app) return;
+          app.remove();
+          detachedApp = app;
+          button.textContent = 'Re-attach component';
+        }
+      });
+    </script>
+  </body>
+</html>
