@@ -24,7 +24,7 @@ class GeoCommentsApp extends HTMLElement {
         }));
 
         const panel = document.createElement('mock-comments-panel');
-        panel.panelConfig = { title: 'Select a location', readOnly: true };
+        panel.panelConfig = emptyPanelState();
         panel.comments = [];
 
         this.append(map, panel);
