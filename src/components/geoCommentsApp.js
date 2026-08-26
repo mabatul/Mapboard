@@ -1,6 +1,6 @@
 import { MAP_CONFIG } from '../../data/config.js';
 import { LOCATIONS } from '../../data/locations.js';
-import { fetchCommentsForLocation } from '../services/commentsApi.js';
+import { fetchCommentsForLocation, addComment } from '../services/commentsApi.js';
 
 let selectedLocation = null;
 let requestToken = 0;
@@ -61,6 +61,32 @@ class GeoCommentsApp extends HTMLElement {
             panel.comments = [];
             panel.panelConfig = emptyPanelState();
             panel.loading = false;
+        });
+
+        function renderMarkers(badgedId, count) {
+            map.markers = LOCATIONS.map(location => ({
+                id: location.id,
+                coordinates: location.coordinates,
+                label: location.name,
+                badge: location.id === badgedId ? count : undefined,
+            }));
+        }
+
+        panel.addEventListener('panel-submit', async function (event) {
+            const body = event.detail.body;
+            if (!selectedLocation) return;
+
+            panel.loading = true;
+
+            try {
+                const newComment = await addComment(selectedLocation.postId, body);
+                panel.comments = [newComment, ...panel.comments];
+                renderMarkers(selectedLocation.id, panel.comments.length);
+            } catch (error) {
+                console.error('Error adding comment:', error);
+            } finally {
+                panel.loading = false;
+            }
         });
     }
 }
