@@ -16,3 +16,4 @@
  *   <mock-comments-panel>   → contract in libs/comments-panel/README.md
  */
 
+import './components/geoCommentsApp.js';
